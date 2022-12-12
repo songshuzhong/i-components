@@ -1,1 +1,1 @@
-# i-components
+# i-component
