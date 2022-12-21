@@ -14,17 +14,14 @@ import {defineComponent, getCurrentInstance, onMounted, ref, watch, nextTick} fr
 import {cloneDeep} from 'lodash';
 import {appendScript} from '../../utils/appendAssets';
 import * as Echarts from 'echarts';
+import MapJson from './china.json';
+
 import 'echarts-wordcloud';
 import 'echarts/extension/bmap/bmap';
 
 export default defineComponent({
   name: 'Chart',
   props: {
-    name: {
-      type: String,
-      required: false,
-      default: ''
-    },
     height: {
       type: [Number, String],
       required: false
@@ -38,11 +35,6 @@ export default defineComponent({
       required: false,
     },
     useMap: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    useWordcloud: {
       type: Boolean,
       required: false,
       default: false
@@ -107,6 +99,7 @@ export default defineComponent({
     };
     const renderMap = () => {
       if (props.useMap) {
+        Echarts.registerMap('china', MapJson);
         return appendScript('', '', 'https://api.map.baidu.com/getscript?ak=R1g6V9BEDdFBoOYlbOHPUXsHUaGjH2HL');
       }
       return Promise.resolve();
