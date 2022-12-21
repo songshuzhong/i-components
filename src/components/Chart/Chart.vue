@@ -1,36 +1,18 @@
 <template>
   <div
-    v-loading="loading"
     class="i-chart__container"
     :style="{height: defaultHeight}"
   >
     <div
-      v-if="!error"
       ref="chart"
-      :style="{height: defaultHeight}"
+      style="height:100%;width:100%;"
     />
-    <el-result
-      v-else
-      icon="error"
-      title="获取数据失败"
-      class="i-chart__container__error"
-    >
-      <template #extra>
-        <el-button
-          type="primary"
-          size="small"
-          @click="createEcharts"
-        >
-          点击重试
-        </el-button>
-      </template>
-    </el-result>
   </div>
 </template>
 <script>
 import {defineComponent, getCurrentInstance, onMounted, ref, watch, nextTick} from 'vue';
 import {cloneDeep} from 'lodash';
-import Echarts from 'echarts';
+import * as Echarts from 'echarts';
 
 export default defineComponent({
   name: 'Chart',
@@ -43,7 +25,7 @@ export default defineComponent({
     height: {
       type: [Number, String],
       required: false,
-      default: 0
+      default: 200
     },
     initData: {
       type: Object,
@@ -104,7 +86,7 @@ export default defineComponent({
       });
       return JSON.parse(option);
     };
-    const createEcharts = async () => {
+    const createEcharts = () => {
       try {
         chartFactory = Echarts.init(proxy.$refs.chart);
         chartFactory.setOption(iConfig.value);

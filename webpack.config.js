@@ -17,7 +17,8 @@ module.exports = {
     Watermark: './src/components/Watermark/index.js',
     Extable: './src/components/Extable/index.js',
     Count: './src/components/Count/index.js',
-    Player: './src/components/Player/index.js'
+    Player: './src/components/Player/index.js',
+    Chart: './src/components/Chart/index.js',
   },
   output: {
     path: path.join(__dirname, 'dist'),

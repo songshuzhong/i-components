@@ -24,7 +24,7 @@ export default defineComponent({
       }
     };
     const createSteps = () => new Promise((resolve) => {
-      props.steps.forEach(({item}) => {
+      props.steps.forEach(item => {
         proxy.$eventHub.$emit('component:track', item.element, path => {
           steps.push({
             element: `[path='${path}']`,
