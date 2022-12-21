@@ -5,14 +5,17 @@
   >
     <div
       ref="chart"
-      style="height:100%;width:100%;"
+      style="height:100%;"
     />
   </div>
 </template>
 <script>
 import {defineComponent, getCurrentInstance, onMounted, ref, watch, nextTick} from 'vue';
 import {cloneDeep} from 'lodash';
+import {appendScript} from '../../utils/appendAssets';
 import * as Echarts from 'echarts';
+import 'echarts-wordcloud';
+import 'echarts/extension/bmap/bmap';
 
 export default defineComponent({
   name: 'Chart',
@@ -35,11 +38,6 @@ export default defineComponent({
       required: false,
     },
     useMap: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    useBMap: {
       type: Boolean,
       required: false,
       default: false
@@ -68,14 +66,15 @@ export default defineComponent({
     let chartFactory;
     iConfig.value = cloneDeep(props.config);
 
-    const shouldComponentUpdate = () => true;
     const onComponentUpdate = () => {
       if (isMounted.value) {
         error.value = false;
         loading.value = true;
         const defaultConfig = cloneDeep(props.config);
         iConfig.value = compiledConfig(defaultConfig, props.initData);
-        createEcharts();
+        nextTick(() => {
+          createEcharts();
+        });
       }
     };
     const compiledConfig = (config = {}, data) => {
@@ -91,12 +90,6 @@ export default defineComponent({
         chartFactory.setOption(iConfig.value);
         chartFactory.on('click', handleClick);
       } catch (e) {
-        proxy.$message({
-          message: e.message,
-          showClose: true,
-          grouping: true,
-          type: 'error',
-        });
         error.value = true;
         console.error(e);
       } finally {
@@ -112,7 +105,12 @@ export default defineComponent({
       } = data;
       props.action(props.actions, other);
     };
-
+    const renderMap = () => {
+      if (props.useMap) {
+        return appendScript('', '', 'https://api.map.baidu.com/getscript?ak=R1g6V9BEDdFBoOYlbOHPUXsHUaGjH2HL');
+      }
+      return Promise.resolve();
+    };
     watch(() => isMounted.value, () => {
       onComponentUpdate();
     });
@@ -121,15 +119,16 @@ export default defineComponent({
     }, {
       deep: true
     });
+
     onMounted(() => {
       const height = props.height || proxy.$refs.chart?.parentNode?.offsetWidth * 0.618;
-      isMounted.value = true;
       defaultHeight.value = typeof height === 'number'? `${height}px`: height;
+      renderMap().then(() => {
+        isMounted.value = true;
+      });
     });
 
     return {
-      path: ctx.attrs.path,
-      shouldComponentUpdate,
       onComponentUpdate,
       handleClick,
       createEcharts,
