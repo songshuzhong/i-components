@@ -24,8 +24,7 @@ export default defineComponent({
     },
     height: {
       type: [Number, String],
-      required: false,
-      default: 200
+      required: false
     },
     initData: {
       type: Object,
@@ -116,6 +115,11 @@ export default defineComponent({
 
     watch(() => isMounted.value, () => {
       onComponentUpdate();
+    });
+    watch(() => props.initData, val => {
+      onComponentUpdate();
+    }, {
+      deep: true
     });
     onMounted(() => {
       const height = props.height || proxy.$refs.chart?.parentNode?.offsetWidth * 0.618;
