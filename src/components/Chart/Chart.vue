@@ -70,11 +70,24 @@ export default defineComponent({
       }
     };
     const compiledConfig = (config = {}, data) => {
-      const temp = JSON.stringify(config);
-      const option = temp.replace(/"\${([^}{]+?)}"/gi, (escape, name) => {
-        return JSON.stringify(data[name]) || '""';
+      Object.keys(config).forEach(function(key) {
+        const mappingValue = config[key];
+        if (Object.prototype.toString.call(mappingValue) === '[object String]') {
+          if (/\$\{.+?\}/g.test(mappingValue)) {
+            const compiledKey = compiledConfig(mappingValue);
+            if (Object.hasOwnProperty.call(data, compiledKey)) {
+              config[key] = data[compiledKey];
+            }
+          }
+        } else if (Object.prototype.toString.call(mappingValue) === '[object Object]') {
+          compiledConfig(mappingValue);
+        } else if (Object.prototype.toString.call(mappingValue) === '[object Array]') {
+          mappingValue.forEach(function(item) {
+            compiledConfig(item);
+          });
+        }
       });
-      return JSON.parse(option);
+      return config;
     };
     const createEcharts = () => {
       try {
