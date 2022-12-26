@@ -69,14 +69,14 @@ export default defineComponent({
         });
       }
     };
-    const compiledConfig = (config = {}, data) => {
+    const compiledConfig = (config = {}) => {
       Object.keys(config).forEach(function(key) {
         const mappingValue = config[key];
         if (Object.prototype.toString.call(mappingValue) === '[object String]') {
           if (/\$\{.+?\}/g.test(mappingValue)) {
-            const compiledKey = compiledConfig(mappingValue);
-            if (Object.hasOwnProperty.call(data, compiledKey)) {
-              config[key] = data[compiledKey];
+            const compiledKey = proxy.$compiledKey(mappingValue);
+            if (Object.hasOwnProperty.call(props.initData, compiledKey)) {
+              config[key] = props.initData[compiledKey];
             }
           }
         } else if (Object.prototype.toString.call(mappingValue) === '[object Object]') {
