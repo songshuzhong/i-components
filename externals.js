@@ -1,3 +1,4 @@
 module.exports = {
-  'vue': 'vue'
+  'vue': 'vue',
+  'i-renderer/dist/js/renderer': 'i-renderer/dist/js/renderer'
 };

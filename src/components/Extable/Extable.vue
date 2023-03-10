@@ -42,10 +42,10 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      proxy.$eventHub.$on('component:remoteComponent', onExportExcel);
+      proxy.$eventHub.$on('component:telecontrol', onExportExcel);
     });
     onBeforeUnmount(() => {
-      proxy.$eventHub.$off('component:remoteComponent', onExportExcel);
+      proxy.$eventHub.$off('component:telecontrol', onExportExcel);
     });
   }
 });

@@ -15,6 +15,11 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(mjs|cjs)$/,
+        include: /node_modules/,
+        type: "javascript/auto"
+      },
+      {
         test: /\.(vue)$/,
         loader: 'vue-loader',
         options: {

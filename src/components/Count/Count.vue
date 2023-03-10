@@ -19,7 +19,7 @@
 </template>
 <script>
 import {defineComponent, computed, getCurrentInstance, onMounted, onBeforeUnmount} from 'vue';
-import CountUp from 'countup.js';
+import {CountUp} from 'countup.js';
 
 export default defineComponent({
   name: 'Count',
@@ -60,7 +60,10 @@ export default defineComponent({
     },
     initData: {
       type: Object,
-      required: false
+      required: false,
+      default: () => {
+        return {}
+      }
     }
   },
   setup(props, ctx) {
@@ -87,7 +90,7 @@ export default defineComponent({
     });
     const startCountUp = () => {
       const value = proxy.$expressionEval(props.value, props.initData);
-      instance = new CountUp(proxy.$refs.countRef, 0, value);
+      instance = new CountUp(proxy.$refs.countRef, value);
       if (!instance.error) {
         instance.start();
       } else {
@@ -106,11 +109,9 @@ export default defineComponent({
     });
 
     return {
-      path: ctx.attrs.path,
       renderTitle,
       renderTip,
-      renderDescription,
-      state
+      renderDescription
     };
   }
 });

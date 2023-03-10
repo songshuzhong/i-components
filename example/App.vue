@@ -1,6 +1,6 @@
 <template>
   <div>
-    <chart :config="option"/>
+    <count description="asdf" :value="1000" :auto="true" />
   </div>
 </template>
 
@@ -14,10 +14,12 @@ import {Watermark} from '../src/components/Watermark/index.js';
 import {Extable} from '../src/components/Extable/index.js';
 import {Player} from '../src/components/Player/index.js';
 import {Chart} from '../src/components/Chart/index.js';
+import {Count} from '../src/components/Count/index.js';
 
 export default defineComponent({
   name: 'Application',
   components: {
+    Count,
     Workflow,
     Richtxt,
     Qrcode,
