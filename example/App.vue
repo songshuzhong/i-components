@@ -1,5 +1,6 @@
 <template>
   <div>
+    <particle />
     <count description="asdf" :value="1000" :auto="true" />
   </div>
 </template>
@@ -15,6 +16,7 @@ import {Extable} from '../src/components/Extable/index.js';
 import {Player} from '../src/components/Player/index.js';
 import {Chart} from '../src/components/Chart/index.js';
 import {Count} from '../src/components/Count/index.js';
+import {Particle} from '../src/components/Particle/index.js';
 
 export default defineComponent({
   name: 'Application',
@@ -27,7 +29,8 @@ export default defineComponent({
     Watermark,
     Extable,
     Player,
-    Chart
+    Chart,
+    Particle
   },
   setup() {
     const option = {
