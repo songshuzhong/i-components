@@ -4,7 +4,7 @@ function box(index, x, y, options) {
     this.index = index;
     this.x = x;
     this.y = y;
-    this.r = Math.random() * 5 + 1;
+    this.r = Math.random() * options.radius + 1;
     var alpha = (Math.floor(Math.random() * 10) + 1) / 10 / 2;
     this.color = "rgba(255,255,255," + alpha + ")";
 }

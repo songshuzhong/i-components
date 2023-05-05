@@ -1,28 +1,39 @@
 <template>
-  <canvas ref="canvas" :width="width" :height="height" />
+  <canvas ref="canvas" :class="classname" />
 </template>
 <script>
-import {defineComponent, getCurrentInstance, onMounted} from 'vue';
+import {defineComponent, getCurrentInstance, onMounted, nextTick} from 'vue';
 import {box} from './box';
 
 export default defineComponent({
   name: 'Particle',
   props: {
+    r: {
+      type: [String, Number],
+      required: false,
+      default: 10
+    },
     width: {
       type: [Number, String],
-      required: false,
-      default: '100%'
+      required: false
     },
     height: {
       type: [Number, String],
-      required: false,
-      default: '100%'
+      required: false
+    },
+    classname: {
+      type: String,
+      required: false
+    },
+    action: {
+      type: Function,
+      required: false
     }
   },
-  setup() {
+  setup(props) {
     const {proxy} = getCurrentInstance();
-    const WIDTH = document.documentElement.clientWidth;
-    const HEIGHT = document.documentElement.clientHeight;
+    const WIDTH = props.width || document.documentElement.clientWidth;
+    const HEIGHT = props.height || document.documentElement.clientHeight;
     const round = [];
     const initRoundPopulation = 80;
     let ctx;
@@ -37,7 +48,7 @@ export default defineComponent({
     };
     const init = () => {
       for (let i = 0; i < initRoundPopulation; i++) {
-        round[i] = new box(i, Math.random() * WIDTH, Math.random() * HEIGHT, {content, height: HEIGHT});
+        round[i] = new box(i, Math.random() * WIDTH, Math.random() * HEIGHT, {content, height: HEIGHT, radius: props.r});
         round[i].draw();
       }
       animate();
@@ -47,7 +58,9 @@ export default defineComponent({
       content = ctx.getContext('2d');
       ctx.width = WIDTH;
       ctx.height = HEIGHT;
-      init();
+      nextTick(() => {
+        init();
+      });
     });
   }
 });

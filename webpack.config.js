@@ -20,6 +20,7 @@ module.exports = {
     Player: './src/components/Player/index.js',
     Chart: './src/components/Chart/index.js',
     Particle: './src/components/Particle/index.js',
+    Todo: './src/components/Todo/index.js',
   },
   output: {
     path: path.join(__dirname, 'dist'),

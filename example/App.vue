@@ -1,7 +1,7 @@
 <template>
   <div>
-    <particle />
     <count description="asdf" :value="1000" :auto="true" />
+    <todo init-api="https://www.fastmock.site/mock/a93e0b29161761b8153cbc02db04c643/api/todos"/>
   </div>
 </template>
 
@@ -17,6 +17,7 @@ import {Player} from '../src/components/Player/index.js';
 import {Chart} from '../src/components/Chart/index.js';
 import {Count} from '../src/components/Count/index.js';
 import {Particle} from '../src/components/Particle/index.js';
+import {Todo} from '../src/components/Todo/index.js';
 
 export default defineComponent({
   name: 'Application',
@@ -30,7 +31,8 @@ export default defineComponent({
     Extable,
     Player,
     Chart,
-    Particle
+    Particle,
+    Todo
   },
   setup() {
     const option = {
@@ -111,3 +113,18 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+html,
+body,
+.i-website-app__container {
+  position: relative;
+  height: 100%;
+  background: cadetblue;
+}
+.demo-particle {
+  position: absolute;
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 20;
+}
+</style>
