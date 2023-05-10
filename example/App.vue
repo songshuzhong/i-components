@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <workflow name="test"/>
-  </div>
+  <workflow name="test"/>
 </template>
 
 <script>

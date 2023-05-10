@@ -49,7 +49,6 @@ module.exports = {
             loader: 'babel-loader',
           },
         ],
-        exclude: path.join(__dirname, 'node_modules'),
       },
       {
         test: /\.(sa|sc|c)ss$/,

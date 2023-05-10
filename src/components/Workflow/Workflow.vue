@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="container"
     :class="['i-workflow__container']"
     :style="{height: defaultHeight}"
   >
@@ -7,19 +8,22 @@
       ref="workflow"
       class="i-workflow__container__body"
     />
+    <div class="i-workflow__container__panel" ref="js-properties-panel" />
   </div>
 </template>
 
 <script>
-import {defineComponent, getCurrentInstance, onMounted, ref, reactive, watch} from 'vue';
+import {defineComponent, getCurrentInstance, onMounted, ref, reactive, watch, nextTick} from 'vue';
 import BpmnJS from 'bpmn-js/lib/Modeler';
-import {xmlStr} from './xmlStr';
+import {BpmnPropertiesPanelModule, BpmnPropertiesProviderModule} from 'bpmn-js-properties-panel';
+import {xmlStr, customTranslate} from './xmlStr';
 
 import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 
 export default defineComponent({
   name: 'Workflow',
@@ -38,7 +42,19 @@ export default defineComponent({
     const createWork = () => {
       try {
         error.value = false;
-        instance = new BpmnJS({container: proxy.$refs.workflow});
+        instance = new BpmnJS({
+          container: proxy.$refs.workflow,
+          propertiesPanel: {
+            parent: proxy.$refs['js-properties-panel']
+          },
+          additionalModules: [
+            BpmnPropertiesPanelModule,
+            BpmnPropertiesProviderModule,
+            {
+              translate: ['value', customTranslate]
+            }
+          ]
+        });
         instance.importXML(iModelValue[props.name]);
       } catch (e) {
         error.value = true;
@@ -58,9 +74,11 @@ export default defineComponent({
 
     onMounted(() => {
       loading.value = true;
-      const height = props.height || proxy.$refs.workflow?.parentNode?.offsetWidth * 0.618;
-      defaultHeight.value = typeof height === 'number'? `${height}px`: height;
-      createWork();
+      nextTick(() => {
+        const height = props.height || proxy.$refs.container?.parentNode?.offsetHeight - 16;
+        defaultHeight.value = typeof height === 'number'? `${height}px`: height;
+        createWork();
+      });
     });
 
     return {
@@ -73,3 +91,14 @@ export default defineComponent({
   }
 });
 </script>
+<style>
+.i-workflow__container {
+  position: relative;
+  border: 1px dashed black;
+}
+.i-workflow__container__panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+</style>
