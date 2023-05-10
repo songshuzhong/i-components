@@ -96,6 +96,9 @@ export default defineComponent({
   position: relative;
   border: 1px dashed black;
 }
+.i-workflow__container__body {
+  height: 100%;
+}
 .i-workflow__container__panel {
   position: absolute;
   top: 20px;
