@@ -12,11 +12,14 @@
 
 <script>
 import {defineComponent, getCurrentInstance, onMounted, ref, reactive, watch} from 'vue';
-import BpmnJS from 'bpmn-js';
-import { xmlStr } from './xmlStr';
+import BpmnJS from 'bpmn-js/lib/Modeler';
+import {xmlStr} from './xmlStr';
 
 import 'bpmn-js/dist/assets/bpmn-js.css';
 import 'bpmn-js/dist/assets/diagram-js.css';
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 
 export default defineComponent({
   name: 'Workflow',
@@ -32,7 +35,6 @@ export default defineComponent({
     const error = ref(false);
     const defaultHeight = ref(200);
     let instance;
-
     const createWork = () => {
       try {
         error.value = false;

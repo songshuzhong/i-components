@@ -1,7 +1,6 @@
 <template>
   <div>
-    <count description="asdf" :value="1000" :auto="true" />
-    <todo init-api="https://www.fastmock.site/mock/a93e0b29161761b8153cbc02db04c643/api/todos"/>
+    <workflow name="test"/>
   </div>
 </template>
 
@@ -119,12 +118,5 @@ body,
 .i-website-app__container {
   position: relative;
   height: 100%;
-  background: cadetblue;
-}
-.demo-particle {
-  position: absolute;
-  height: 100% !important;
-  width: 100% !important;
-  z-index: 20;
 }
 </style>
