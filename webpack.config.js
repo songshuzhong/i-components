@@ -21,6 +21,7 @@ module.exports = {
     Chart: './src/components/Chart/index.js',
     Particle: './src/components/Particle/index.js',
     Todo: './src/components/Todo/index.js',
+    Intro: './src/components/Intro/index.js',
   },
   output: {
     path: path.join(__dirname, 'dist'),
