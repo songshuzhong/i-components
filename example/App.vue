@@ -1,35 +1,17 @@
 <template>
-  <workflow name="test"/>
+  <div>
+    <schema :init-schema="schema"/>
+  </div>
 </template>
 
 <script>
 import {defineComponent} from 'vue';
-import {Richtxt} from '../src/components/Richtxt/index.js';
-import {Workflow} from '../src/components/Workflow/index.js';
-import {Qrcode} from '../src/components/Qrcode/index.js';
-import {Driver} from '../src/components/Driver/index.js';
-import {Watermark} from '../src/components/Watermark/index.js';
-import {Extable} from '../src/components/Extable/index.js';
-import {Player} from '../src/components/Player/index.js';
-import {Chart} from '../src/components/Chart/index.js';
-import {Count} from '../src/components/Count/index.js';
-import {Particle} from '../src/components/Particle/index.js';
-import {Todo} from '../src/components/Todo/index.js';
+import {Schema} from 'i-renderer/dist/js/renderer';
 
 export default defineComponent({
   name: 'Application',
   components: {
-    Count,
-    Workflow,
-    Richtxt,
-    Qrcode,
-    Driver,
-    Watermark,
-    Extable,
-    Player,
-    Chart,
-    Particle,
-    Todo
+    Schema
   },
   setup() {
     const option = {
@@ -103,8 +85,37 @@ export default defineComponent({
         }
       ]
     };
-
+    const schema = {
+      renderer: 'page',
+      body: [
+        {
+          name: 'aaa',
+          renderer: 'alert'
+        },
+        {
+          name: 'bbb',
+          renderer: 'alert'
+        },
+        {
+          renderer: 'intro',
+          lazy: true,
+          steps: [
+            {
+              element: 'aaa',
+              title: 'intro',
+              intro: 'this is intro.'
+            },
+            {
+              element: 'bbb',
+              title: 'intro',
+              intro: 'this is intro.'
+            }
+          ]
+        }
+      ]
+    };
     return {
+      schema,
       option
     };
   },
@@ -116,5 +127,8 @@ body,
 .i-website-app__container {
   position: relative;
   height: 100%;
+}
+.i-website-app__container {
+  padding: 20px;
 }
 </style>
