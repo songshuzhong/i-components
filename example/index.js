@@ -13,8 +13,9 @@ import {Player} from '../src/components/Player/index.js';
 import {Chart} from '../src/components/Chart/index.js';
 import {Count} from '../src/components/Count/index.js';
 import {Particle} from '../src/components/Particle/index.js';
-import {Todo} from '../src/components/Todo/index.js';*/
-import {Intro} from '../src/components/Intro/index.js';
+import {Todo} from '../src/components/Todo/index.js';
+import {Intro} from '../src/components/Intro/index.js';*/
+import {Issues} from '../src/components/Issues/index.js';
 
 import 'element-plus/dist/index.css';
 import 'i-renderer/dist/css/index.css';
@@ -33,8 +34,9 @@ const options = {
     Player,
     Chart,
     Particle,
-    Todo,*/
-    Intro
+    Todo,
+    Intro*/
+    Issues
   ]
 };
 

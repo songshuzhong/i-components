@@ -89,28 +89,7 @@ export default defineComponent({
       renderer: 'page',
       body: [
         {
-          name: 'aaa',
-          renderer: 'alert'
-        },
-        {
-          name: 'bbb',
-          renderer: 'alert'
-        },
-        {
-          renderer: 'intro',
-          lazy: true,
-          steps: [
-            {
-              element: 'aaa',
-              title: 'intro',
-              intro: 'this is intro.'
-            },
-            {
-              element: 'bbb',
-              title: 'intro',
-              intro: 'this is intro.'
-            }
-          ]
+          renderer: 'issues'
         }
       ]
     };
