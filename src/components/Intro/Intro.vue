@@ -16,7 +16,7 @@ const DEFAULT_OPTIONS = {
 };
 
 export default defineComponent({
-  name: 'i-intro',
+  name: 'Intro',
   props: {
     steps: {
       type: [Array, Object],

@@ -22,6 +22,7 @@ module.exports = {
     Particle: './src/components/Particle/index.js',
     Todo: './src/components/Todo/index.js',
     Intro: './src/components/Intro/index.js',
+    Issues: './src/components/Issues/index.js',
   },
   output: {
     path: path.join(__dirname, 'dist'),
