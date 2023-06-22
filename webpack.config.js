@@ -23,6 +23,7 @@ module.exports = {
     Todo: './src/components/Todo/index.js',
     Intro: './src/components/Intro/index.js',
     Issues: './src/components/Issues/index.js',
+    Schedule: './src/components/Schedule/index.js',
   },
   output: {
     path: path.join(__dirname, 'dist'),
