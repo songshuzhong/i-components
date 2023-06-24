@@ -1,6 +1,7 @@
 <template>
   <div ref="richtxt" class="i-form__richtext" />
 </template>
+
 <script>
 import {getCurrentInstance, defineComponent, reactive, watch, onMounted, onBeforeUnmount} from 'vue';
 import E from 'wangeditor'
@@ -10,7 +11,21 @@ export default defineComponent({
   props: {
     name: String,
     defaultValue: String,
-    value: String
+    value: String,
+    disabled: Boolean,
+    disabledOn: String,
+    action: {
+      type: Function,
+      required: false,
+    },
+    linkageTrigger: {
+      type: Function,
+      required: false,
+    },
+    initData: {
+      type: Object,
+      required: false
+    }
   },
   setup(props, ctx) {
     const { proxy } = getCurrentInstance();
@@ -19,18 +34,20 @@ export default defineComponent({
     const onRichtxtChange = txt => {
       iModelValue[props.name] = txt;
     };
+    const onChecking = async() => {
+      proxy.$parent.validateState = status;
+      proxy.$parent.validateMessage = message;
+    };
     watch(() => props.defaultValue, (val) => {
       iModelValue[props.name] = val;
     }, {
       immediate: true,
     });
-
     watch(() => props.value, (val) => {
       iModelValue[props.name] = val || 0;
     }, {
       immediate: true,
     });
-
     watch(() => iModelValue[props.name], (val) => {
       ctx.emit('update:value', val);
     });
@@ -41,6 +58,9 @@ export default defineComponent({
       richEditor.config.onchange = onRichtxtChange;
       richEditor.create();
       richEditor.txt.html(iModelValue[props.name] || '');
+      if (props.disabled) {
+        richEditor.disable();
+      }
     });
     onBeforeUnmount(() => {
       richEditor && richEditor.destroy && richEditor.destroy();

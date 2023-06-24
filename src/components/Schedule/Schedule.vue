@@ -1,5 +1,8 @@
 <template>
-  <div class="i-delivery-schedule">
+  <div :class="{
+    'i-delivery-schedule': true,
+    disabled: disabled
+  }">
     <div class="i-delivery-schedule__content">
       <aside class="i-delivery-schedule__frame">
         <div class="i-delivery-schedule__category">
@@ -92,6 +95,20 @@ export default defineComponent({
       required: false,
       default: {}
     },
+    disabled: Boolean,
+    disabledOn: String,
+    action: {
+      type: Function,
+      required: false,
+    },
+    linkageTrigger: {
+      type: Function,
+      required: false,
+    },
+    initData: {
+      type: Object,
+      required: false
+    }
   },
   setup(props, ctx) {
     const {proxy} = getCurrentInstance();
@@ -255,6 +272,13 @@ export default defineComponent({
 .i-delivery-schedule {
   position: relative;
   width: 536px;
+  &.disabled {
+    pointer-events: none;
+    .i-delivery-schedule__clear,
+    .i-delivery-schedule__tip {
+      color: var(--el-text-color-disabled);
+    }
+  }
 }
 
 .i-delivery-schedule__content {

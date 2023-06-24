@@ -16,12 +16,12 @@ module.exports = {
     rules: [
       {
         test: /\.(mjs|cjs)$/,
-        include: /node_modules/,
         type: "javascript/auto"
       },
       {
         test: /\.(vue)$/,
         loader: 'vue-loader',
+        exclude: path.join(__dirname, 'node_modules'),
         options: {
           loaders: {
             js: 'babel-loader'

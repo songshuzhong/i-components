@@ -1,6 +1,7 @@
 <template>
   <div>
     <schema :init-schema="schema"/>
+    <sc-async-cascader />
   </div>
 </template>
 
@@ -89,7 +90,27 @@ export default defineComponent({
       renderer: 'page',
       body: [
         {
-          renderer: 'issues'
+          renderer: 'count',
+          value: 1000,
+          auto: true
+        },
+        {
+          renderer: 'katex',
+          exp: 'c = \\pm\\sqrt{a^2 + b^2}'
+        },
+        {
+          renderer: 'form',
+          disabledOn: '1==1',
+          controls: [
+            {
+              renderer: 'schedule',
+              name: 'schedule'
+            },
+            {
+              renderer: 'richtxt',
+              name: 'Richtxt'
+            }
+          ]
         }
       ]
     };

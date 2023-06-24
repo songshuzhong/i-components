@@ -24,6 +24,7 @@ module.exports = {
     Intro: './src/components/Intro/index.js',
     Issues: './src/components/Issues/index.js',
     Schedule: './src/components/Schedule/index.js',
+    Katex: './src/components/Katex/index.js',
   },
   output: {
     path: path.join(__dirname, 'dist'),
