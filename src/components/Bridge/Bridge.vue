@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {defineComponent, onMounted, reactive, watch} from 'vue';
+import {defineComponent, onMounted, onBeforeUnmount, reactive, watch, getCurrentInstance} from 'vue';
 export default defineComponent({
   name: 'Bridge',
   props: {
@@ -31,30 +31,48 @@ export default defineComponent({
       type: Object,
       required: false,
       default: {}
-    }
+    },
+    immediate: Boolean
   },
   setup(props, ctx) {
+    const {proxy} = getCurrentInstance();
     const iModelValue = reactive({});
     const onAction = () => {
       return new Promise((resolve) => {
+        console.log(`before ${props.type} ${props.library} ${props.method}`);
         window[props.library][props.type](props.method, arguments, function(res = {}, status) {
+          console.log(`in ${props.type} ${props.library} ${props.method}`);
           resolve({
             ...res,
             status
           });
         });
+        console.log(`after ${props.type} ${props.library} ${props.method}`);
       });
+    };
+    const handleAction = async(target) => {
+      if (target === props.name) {
+        iModelValue[props.name] = await onAction();
+        console.log(iModelValue[props.name]);
+      }
     };
     watch(() => iModelValue[props.name], val => {
       ctx.emit('update:value', val);
+    }, {
+      deep: true
     });
     onMounted(() => {
+      proxy.$eventHub.$on('component:telecontrol', handleAction);
       const timer = setTimeout(async() => {
-        if (window[props.library]) {
+        if (window[props.library] && props.immediate) {
           iModelValue[props.name] = await onAction();
+          console.log(iModelValue[props.name]);
         }
         clearTimeout(timer);
       }, 2000);
+    });
+    onBeforeUnmount(() => {
+      proxy.$eventHub.$off('component:telecontrol', handleAction);
     });
   }
 })
