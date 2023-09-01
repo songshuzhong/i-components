@@ -48,10 +48,13 @@ export default defineComponent({
     watch(() => iModelValue[props.name], val => {
       ctx.emit('update:value', val);
     });
-    onMounted(async() => {
-      if (window[props.library]) {
-        iModelValue[props.name] = await onAction();
-      }
+    onMounted(() => {
+      const timer = setTimeout(async() => {
+        if (window[props.library]) {
+          iModelValue[props.name] = await onAction();
+        }
+        clearTimeout(timer);
+      }, 2000);
     });
   }
 })
