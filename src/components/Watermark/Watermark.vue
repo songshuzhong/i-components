@@ -12,6 +12,11 @@ export default defineComponent({
       type: String,
       required: false,
       default: 'watermark'
+    },
+    destructible: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   setup(props) {
@@ -21,7 +26,9 @@ export default defineComponent({
       watermarkDom.render();
     });
     onBeforeUnmount(() => {
-      watermarkDom && watermarkDom.destroy();
+      if (props.destructible) {
+        watermarkDom && watermarkDom.destroy();
+      }
     });
   }
 });

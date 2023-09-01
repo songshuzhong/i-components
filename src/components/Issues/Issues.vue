@@ -1,17 +1,27 @@
 <template>
-  <div id="comments" />
+  <div id="comments">
+    <el-skeleton v-if="!isMounted" :rows="6" animated />
+  </div>
 </template>
 <script>
-import {defineComponent, onMounted} from 'vue';
+import {defineComponent, onMounted, ref} from 'vue';
 export default defineComponent({
   name: 'Issues',
-  setup() {
+  props: {
+    repo: {
+      type: String,
+      required: false,
+      default: 'songshuzhong/i-comments'
+    }
+  },
+  setup(props) {
+    const isMounted = ref(false);
     onMounted(() => {
       const comments = document.getElementById('comments');
       const script = document.createElement('script')
       script.type = 'text/javascript';
       script.src = 'https://utteranc.es/client.js';
-      script.setAttribute('repo', 'songshuzhong/i-comments');
+      script.setAttribute('repo', props.repo);
       script.setAttribute('issue-term', 1);
       script.setAttribute('theme', 'github-light');
       script.setAttribute('crossorigin', 'anonymous');
@@ -22,7 +32,11 @@ export default defineComponent({
           script.readyState === 'complete'
         ) {
           script.onload = script.onreadystatechange = null;
-          console.log('comments loaded');
+          const frame = document.querySelectorAll('.utterances-frame')[0];
+          frame.onload = frame.onreadystatechange = function() {
+            isMounted.value = true;
+            console.log('comments loaded');
+          }
         } else {
           console.error('comments loaded');
         }
@@ -33,6 +47,9 @@ export default defineComponent({
       }
       comments.appendChild(script);
     });
+    return {
+      isMounted
+    };
   }
 });
 </script>

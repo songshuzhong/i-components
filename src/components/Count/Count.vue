@@ -116,3 +116,40 @@ export default defineComponent({
   }
 });
 </script>
+<style lang="scss">
+.i-info__container {
+  position: relative;
+  padding: 5px 0;
+  .i-info__title {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    font-weight: 500;
+    font-size: 30px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--el-text-color-primary);
+  }
+  .i-info__unit {
+    display: inline-block;
+    margin-left: 5px;
+    font-weight: 400;
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--el-text-color-secondary);
+  }
+  .i-info__tip {
+    position: absolute;
+  }
+  .i-info__description {
+    padding: 0 5px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--el-text-color-regular);
+  }
+}
+</style>
