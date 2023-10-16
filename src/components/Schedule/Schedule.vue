@@ -468,7 +468,7 @@ export default defineComponent({
 .h5 {
   .i-delivery-schedule__frame {
     display: flex;
-    width: 373px;
+    width: 350px;
   }
   .i-delivery-schedule__category {
     width: 60px;
@@ -476,13 +476,13 @@ export default defineComponent({
     line-height: 34px;
   }
   .i-delivery-schedule__content {
-    max-width: 375px;
+    max-width: 350px;
     height: 490px;
     overflow: unset
   }
   .i-delivery-schedule__body {
     margin-left: 0;
-    transform: rotate(-90deg) translate(-74px, -41px);
+    transform: rotate(-90deg) translate(-86px, -53px);
   }
   .i-delivery-schedule__week {
     width: 45px;
@@ -490,11 +490,11 @@ export default defineComponent({
   }
   .i-delivery-schedule__time {
     width: 456px;
-    height: 30px;
+    height: 33px;
   }
   .i-delivery-schedule__cell {
-    width: 19px;
-    height: 45px;
+    width: 20px;
+    height: 41px;
     &:hover {
       &::after {
         transform: rotate(90deg);
