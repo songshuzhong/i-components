@@ -3,8 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <title>Sample-UMIS</title>
+    <script type="text/javascript">
+        (function flexible (window, document) {
+            const docEl = document.documentElement
+            const dpr = window.devicePixelRatio || 1
+            const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
+            const html = docEl.classList;
+            if (isMobile) {
+                html.remove('pc');
+                html.add('mobile');
+            } else {
+                html.remove('mobile');
+                html.add('pc');
+            }
+
+            // adjust body font size
+            function setBodyFontSize () {
+                if (document.body && document.body.clientWidth <= 750) {
+                    document.body.style.fontSize = (12 * dpr) + 'px';
+                } else if (document.body && document.body.clientWidth >= 750) {
+                    // document.body.style.maxWidth = '750px';
+                } else {
+                    document.addEventListener('DOMContentLoaded', setBodyFontSize)
+                }
+            }
+            setBodyFontSize();
+
+            // set 1rem = viewWidth / 10
+            function setRemUnit () {
+                var rem = 0;
+                if (document.body && document.body.clientWidth >= 375) {
+                    rem = 375 / 10;
+                    // document.body.style.maxWidth = '751px';
+                } else if (!document.body && docEl.clientWidth > 375) {
+                    rem = 375 / 10;
+                } else {
+                    rem = docEl.clientWidth / 10;
+                }
+                docEl.style.fontSize = '37.5px';
+            }
+
+            setRemUnit()
+
+            // reset rem unit on page resize
+            window.addEventListener('resize', setRemUnit)
+            window.addEventListener('pageshow', function (e) {
+                if (e.persisted) {
+                    setRemUnit()
+                }
+            })
+
+            // detect 0.5px supports
+            if (dpr >= 2) {
+                var fakeBody = document.createElement('body')
+                var testElement = document.createElement('div')
+                testElement.style.border = '.5px solid transparent'
+                fakeBody.appendChild(testElement)
+                docEl.appendChild(fakeBody)
+                if (testElement.offsetHeight === 1) {
+                    docEl.classList.add('hairlines')
+                }
+                docEl.removeChild(fakeBody)
+            }
+        }(window, document))
+    </script>
 </head>
 <body>
-    <div class="i-website-app__container"></div>
+    <div class="i-website-app__container h5"></div>
 </body>
 </html>

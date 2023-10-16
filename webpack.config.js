@@ -8,23 +8,7 @@ const copyright = require('./copyright');
 module.exports = {
   mode: 'production',
   entry: {
-    Richtxt: './src/components/Richtxt/index.js',
-    HelloWorld: './src/components/HelloWorld/index.js',
-    Verify: './src/components/Verify/index.js',
-    Workflow: './src/components/Workflow/index.js',
-    Driver: './src/components/Driver/index.js',
-    Qrcode: './src/components/Qrcode/index.js',
-    Watermark: './src/components/Watermark/index.js',
-    Extable: './src/components/Extable/index.js',
-    Count: './src/components/Count/index.js',
-    Player: './src/components/Player/index.js',
-    Chart: './src/components/Chart/index.js',
-    Particle: './src/components/Particle/index.js',
-    Todo: './src/components/Todo/index.js',
-    Intro: './src/components/Intro/index.js',
-    Issues: './src/components/Issues/index.js',
-    Schedule: './src/components/Schedule/index.js',
-    Katex: './src/components/Katex/index.js',
+    Schedule: './src/components/Schedule/index.js'
   },
   output: {
     path: path.join(__dirname, 'dist'),

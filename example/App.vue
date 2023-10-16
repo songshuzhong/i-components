@@ -1,7 +1,6 @@
 <template>
   <div>
-    <schema :init-schema="schema"/>
-    <sc-async-cascader />
+    <Schedule />
   </div>
 </template>
 
@@ -90,26 +89,19 @@ export default defineComponent({
       renderer: 'page',
       body: [
         {
-          renderer: 'count',
-          value: 1000,
-          auto: true
-        },
-        {
-          renderer: 'katex',
-          exp: 'c = \\pm\\sqrt{a^2 + b^2}'
-        },
-        {
           renderer: 'form',
           disabledOn: '1==1',
           controls: [
             {
-              renderer: 'schedule',
-              name: 'schedule'
+              renderer: 'Schedule'
             },
             {
-              renderer: 'richtxt',
-              name: 'Richtxt'
-            }
+              renderer: 'bridge',
+              name: 'suit_info',
+              library: 'WeiboJSBridge',
+              type: 'invoke',
+              method: 'GetLightSkinInfo'
+            },
           ]
         }
       ]

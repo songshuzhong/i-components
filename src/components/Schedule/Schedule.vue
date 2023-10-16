@@ -20,10 +20,10 @@
       <div class="i-delivery-schedule__body">
         <div class="i-delivery-schedule__time">
           <div class="i-delivery-schedule__time__noon">
-            00:00 - 11:00
+            {{isH5? '23:00 - 12:00': '00:00 - 11:00'}}
           </div>
           <div class="i-delivery-schedule__time__noon">
-            12:00 - 23:00
+            {{isH5? '11:00 - 00:00': '12:00 - 23:00'}}
           </div>
         </div>
         <table class="i-delivery-schedule__body__table">
@@ -32,11 +32,11 @@
               <th
                 v-for="hour in 24"
                 :key="hour"
-                :label="createTips(0, hour - 1)"
+                :label="createTips(0, isH5? 24 - hour: hour - 1)"
                 class="i-delivery-schedule__cell"
-                @click="onTheadClick(hour - 1)"
+                @click="onTheadClick(isH5? 24 - hour: hour - 1)"
               >
-                {{ hour - 1 }}
+                {{ isH5? 24 - hour: hour - 1 }}
               </th>
             </tr>
           </thead>
@@ -51,9 +51,9 @@
                 ref="scheduleCell"
                 class="i-delivery-schedule__cell"
                 :data-week="week"
-                :data-hour="hour - 1"
-                :class="isActive(collector, week, hour - 1) ? 'active' : ''"
-                :label="createTips(week, hour - 1)"
+                :data-hour="isH5? 24 - hour: hour - 1"
+                :class="isActive(collector, week, isH5? 24 - hour: hour - 1) ? 'active' : ''"
+                :label="createTips(week, isH5? 24 - hour: hour - 1)"
                 @click="onCellClick"
                 @mousedown="onCellDown"
                 @mousemove="onCellHover"
@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import {defineComponent, getCurrentInstance, onMounted, ref, watch, nextTick} from 'vue';
+import {defineComponent, getCurrentInstance, onBeforeMount, onMounted, ref, watch, nextTick} from 'vue';
 import {cloneDeep} from 'lodash';
 export default defineComponent({
   name: 'Schedule',
@@ -118,6 +118,7 @@ export default defineComponent({
     const isDragging = ref(false);
     const collector = ref(props.value || {});
     const weeks = ['一', '二', '三', '四', '五', '六', '日'];
+    const isH5 = ref(false);
 
     const isActive = (collector, week, hour) => {
       return collector[week] && collector[week].includes(hour)
@@ -246,7 +247,14 @@ export default defineComponent({
     watch(() => collector.value, val => {
       ctx.emit('update:value', val);
     });
+    onBeforeMount(() => {
+      const page = document.querySelector('.i-website-app__container');
+      if (page && page.classList.contains('h5')) {
+        isH5.value = true;
+      }
+    });
     return {
+      isH5,
       startY,
       startX,
       isClick,
@@ -280,21 +288,18 @@ export default defineComponent({
     }
   }
 }
-
 .i-delivery-schedule__content {
   border-radius: 4px;
   overflow: hidden;
   border: solid 1px #E6E7E8;
   border-bottom: 0;
 }
-
 .i-delivery-schedule__tools {
   position: relative;
   height: 40px;
   display: flex;
   align-items: center;
 }
-
 .i-delivery-schedule__inactive {
   position: absolute;
   left: 22px;
@@ -312,7 +317,6 @@ export default defineComponent({
     transform: translate3d(0, -50%, 0);
   }
 }
-
 .i-delivery-schedule__active {
   position: absolute;
   left: 66px + 22px;
@@ -332,14 +336,12 @@ export default defineComponent({
     transform: translate3d(0, -50%, 0);
   }
 }
-
 .i-delivery-schedule__tip {
   position: absolute;
   left: 50%;
   font-size: 12px;
   transform: translate3d(-50%, 0, 0);
 }
-
 .i-delivery-schedule__clear {
   position: absolute;
   right: 0;
@@ -350,12 +352,10 @@ export default defineComponent({
   border-radius: 2px;
   cursor: pointer;
 }
-
 .i-delivery-schedule__body {
   width: 456px;
   margin-left: 80px;
 }
-
 .i-delivery-schedule__time {
   width: 456px;
   height: 34px;
@@ -366,7 +366,6 @@ export default defineComponent({
   border-bottom: 0;
   border-top: 0;
 }
-
 .i-delivery-schedule__time__noon {
   width: 50%;
   height: 34px;
@@ -378,12 +377,10 @@ export default defineComponent({
     border-right: 1px solid #DADCDE;
   }
 }
-
 .i-delivery-schedule__frame {
   position: absolute;
   width: 80px;
 }
-
 .i-delivery-schedule__category {
   position: relative;
   width: 80px;
@@ -397,15 +394,12 @@ export default defineComponent({
   line-height:  64px;
   font-size: 12px;
 }
-
 .i-delivery-schedule__category__time {
   text-align: right;
 }
-
 .i-delivery-schedule__category__week {
   line-height: 34px;
 }
-
 .i-delivery-schedule__week {
   width: 80px;
   height: 34px;
@@ -416,7 +410,6 @@ export default defineComponent({
   background-color: #F2F3F4;
   cursor: pointer;
 }
-
 .i-delivery-schedule__body__table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -434,7 +427,6 @@ export default defineComponent({
     background-color: var(--el-color-white);
   }
 }
-
 .i-delivery-schedule__cell {
   width: 19px;
   height: 34px;
@@ -471,6 +463,46 @@ export default defineComponent({
 
   &.on-hover {
     background-color: var(--el-color-primary);
+  }
+}
+.h5 {
+  .i-delivery-schedule__frame {
+    display: flex;
+    width: 373px;
+  }
+  .i-delivery-schedule__category {
+    width: 60px;
+    height: 34px;
+    line-height: 34px;
+  }
+  .i-delivery-schedule__content {
+    max-width: 375px;
+    height: 490px;
+    overflow: unset
+  }
+  .i-delivery-schedule__body {
+    margin-left: 0;
+    transform: rotate(-90deg) translate(-74px, -41px);
+  }
+  .i-delivery-schedule__week {
+    width: 45px;
+    height: 34px;
+  }
+  .i-delivery-schedule__time {
+    width: 456px;
+    height: 30px;
+  }
+  .i-delivery-schedule__cell {
+    width: 19px;
+    height: 45px;
+    &:hover {
+      &::after {
+        transform: rotate(90deg);
+      }
+    }
+  }
+  .i-delivery-schedule__tip {
+    display: none;
   }
 }
 </style>

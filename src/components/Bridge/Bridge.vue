@@ -68,6 +68,12 @@ export default defineComponent({
           iModelValue[props.name] = await onAction();
           console.log(iModelValue[props.name]);
         }
+        if (!window[props.library]) {
+          iModelValue[props.name] = {
+            status: 0,
+            message: 'out of app'
+          };
+        }
         clearTimeout(timer);
       }, 2000);
     });
