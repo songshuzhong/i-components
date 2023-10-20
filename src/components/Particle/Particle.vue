@@ -3,7 +3,7 @@
 </template>
 <script>
 import {defineComponent, getCurrentInstance, onMounted, onBeforeUnmount, ref, nextTick} from 'vue';
-import {box} from './box';
+import {box} from './box.js';
 
 export default defineComponent({
   name: 'Particle',
