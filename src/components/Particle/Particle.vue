@@ -2,9 +2,7 @@
   <canvas ref="canvas" :class="classname" />
 </template>
 <script>
-import {defineComponent, getCurrentInstance, onMounted, ref, nextTick} from 'vue';
-import {useResizeObserver} from '@vueuse/core';
-import {debounce} from 'lodash';
+import {defineComponent, getCurrentInstance, onMounted, onBeforeUnmount, ref, nextTick} from 'vue';
 import {box} from './box';
 
 export default defineComponent({
@@ -40,11 +38,7 @@ export default defineComponent({
     const initRoundPopulation = 80;
     let ctx;
     let content;
-    const onResize = debounce(() => {
-      width.value = proxy.$.refs.canvas.parentNode.offsetWidth;
-      ctx.width = width.value;
-      init();
-    }, 200);
+    let resizeObserver;
     const animate = () => {
       content.clearRect(0, 0, width.value, HEIGHT);
       for (const i in round) {
@@ -59,8 +53,25 @@ export default defineComponent({
       }
       animate();
     };
+    const debounce = (fn, wait = 200) => {
+      let timer;
+      return function() {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          fn.call(this);
+        }, wait);
+      }
+    };
+    const resize = debounce(() => {
+      width.value = proxy.$.refs.canvas.parentNode.offsetWidth;
+      ctx.width = width.value;
+      init();
+    });
     onMounted(() => {
-      useResizeObserver(proxy.$.refs.canvas.parentNode, onResize);
+      resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(proxy.$.refs.canvas.parentNode);
       width.value = proxy.$.refs.canvas.parentNode.offsetWidth;
       ctx = proxy.$.refs.canvas;
       content = ctx.getContext('2d');
@@ -69,6 +80,9 @@ export default defineComponent({
       nextTick(() => {
         init();
       });
+    });
+    onBeforeUnmount(() => {
+      resizeObserver.unobserve(proxy.$.refs.canvas.parentNode);
     });
   }
 });
