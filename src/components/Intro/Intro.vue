@@ -30,28 +30,18 @@ export default defineComponent({
 
     const initIntro = () => {
       if (props.steps && !proxy.$iRenderConfig.editable) {
-        createSteps().then(() => onIntroStart());
-      }
-    };
-    const createSteps = () => new Promise((resolve) => {
-      props.steps.forEach((item, index) => {
-        proxy.$eventHub.$emit('component:track', item.element, path => {
+        props.steps.forEach((item, index) => {
           steps.push({
             ...item,
             step: index,
-            element: `[path='${path}']`
+            element: `[path='${item.path}']`
           });
-          if (steps.length === props.steps.length) {
-            resolve();
-          }
         });
-      });
-    });
-    const onIntroStart = async() => {
-      instance.setOptions({
-        ...DEFAULT_OPTIONS,
-        steps
-      }).start();
+        instance.setOptions({
+          ...DEFAULT_OPTIONS,
+          steps
+        }).start();
+      }
     };
 
     onMounted(() => {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Schedule />
+    <Particle :height="260" />
   </div>
 </template>
 

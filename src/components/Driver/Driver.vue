@@ -20,22 +20,15 @@ export default defineComponent({
 
     const initDriver = () => {
       if (props.steps && !proxy.$iRenderConfig.editable) {
-        createSteps().then(() => onDriverStart());
-      }
-    };
-    const createSteps = () => new Promise((resolve) => {
-      props.steps.forEach(item => {
-        proxy.$eventHub.$emit('component:track', item.element, path => {
+        props.steps.forEach(item => {
           steps.push({
-            element: `[path='${path}']`,
+            element: `[path='${item.path}']`,
             popover: item
           });
-          if (steps.length === props.steps.length) {
-            resolve();
-          }
         });
-      });
-    });
+        onDriverStart();
+      }
+    };
     const onDriverStart = async() => {
       event.preventDefault();
       event.stopPropagation();

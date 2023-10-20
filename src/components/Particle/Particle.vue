@@ -2,7 +2,9 @@
   <canvas ref="canvas" :class="classname" />
 </template>
 <script>
-import {defineComponent, getCurrentInstance, onMounted, nextTick} from 'vue';
+import {defineComponent, getCurrentInstance, onMounted, ref, nextTick} from 'vue';
+import {useResizeObserver} from '@vueuse/core';
+import {debounce} from 'lodash';
 import {box} from './box';
 
 export default defineComponent({
@@ -32,15 +34,19 @@ export default defineComponent({
   },
   setup(props) {
     const {proxy} = getCurrentInstance();
-    const WIDTH = props.width || document.documentElement.clientWidth;
+    const width = ref(props.width || document.documentElement.clientWidth);
     const HEIGHT = props.height || document.documentElement.clientHeight;
     const round = [];
     const initRoundPopulation = 80;
     let ctx;
     let content;
-
+    const onResize = debounce(() => {
+      width.value = proxy.$.refs.canvas.parentNode.offsetWidth;
+      ctx.width = width.value;
+      init();
+    }, 200);
     const animate = () => {
-      content.clearRect(0, 0, WIDTH, HEIGHT);
+      content.clearRect(0, 0, width.value, HEIGHT);
       for (const i in round) {
         round[i].move();
       }
@@ -48,15 +54,17 @@ export default defineComponent({
     };
     const init = () => {
       for (let i = 0; i < initRoundPopulation; i++) {
-        round[i] = new box(i, Math.random() * WIDTH, Math.random() * HEIGHT, {content, height: HEIGHT, radius: props.r});
+        round[i] = new box(i, Math.random() * width.value, Math.random() * HEIGHT, {content, height: HEIGHT, radius: props.r});
         round[i].draw();
       }
       animate();
     };
     onMounted(() => {
+      useResizeObserver(proxy.$.refs.canvas.parentNode, onResize);
+      width.value = proxy.$.refs.canvas.parentNode.offsetWidth;
       ctx = proxy.$.refs.canvas;
       content = ctx.getContext('2d');
-      ctx.width = WIDTH;
+      ctx.width = width.value;
       ctx.height = HEIGHT;
       nextTick(() => {
         init();

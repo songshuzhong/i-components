@@ -8,7 +8,7 @@ const copyright = require('./copyright');
 module.exports = {
   mode: 'production',
   entry: {
-    Schedule: './src/components/Schedule/index.js'
+    Particle: './src/components/Particle/index.js'
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -32,6 +32,7 @@ module.exports = {
       },
       {
         test: /\.(jsx|js)$/,
+        exclude: path.join(__dirname, 'node_modules'),
         use: [
           {
             loader: 'babel-loader',

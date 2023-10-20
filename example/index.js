@@ -3,7 +3,7 @@ import Application from './App.vue';
 import ElementPlus from 'element-plus';
 import IRenderer from 'i-renderer/dist/js/renderer';
 
-import {Schedule} from '../src/components/Schedule/index.js';
+import {Particle} from '../src/components/Particle/index.js';
 
 import 'element-plus/dist/index.css';
 import 'i-renderer/dist/css/index.css';
@@ -12,10 +12,10 @@ const app = createApp(Application);
 
 const options = {
   renderers: [
-    Schedule
+    Particle
   ]
 };
-app.component('Schedule', Schedule)
+app.component('Particle', Particle)
 app
   .use(ElementPlus)
   .use(IRenderer, options)
