@@ -2,7 +2,7 @@
   <canvas ref="canvas" :class="classname" />
 </template>
 <script>
-import {defineComponent, getCurrentInstance, onMounted, onBeforeUnmount, ref, nextTick} from 'vue'import {box} from './box';
+import {defineComponent, getCurrentInstance, onMounted, onBeforeUnmount, ref, nextTick} from 'vue';
 
 function box(index, x, y, options) {
   this.content = options.content;
