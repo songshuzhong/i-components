@@ -28,7 +28,7 @@ export default defineComponent({
     const state = reactive({
       pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",   // 随机字符串
       width: 120,                                     //展示区域宽度
-      height: 40,                                     //展示区域高度
+      height: 32,                                     //展示区域高度
       imgCode: "",                                    //保存页面的内容（用来判断输入验证是否满足改code）
     });
 
@@ -93,7 +93,7 @@ export default defineComponent({
     };
     watch(() => state.imgCode, val => {
       ctx.emit('update:value', val);
-    })
+    });
     onMounted(() => {
       nextTick(() => {
         draw();

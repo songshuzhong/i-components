@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Particle :height="260" />
+    <Verify :height="260" />
   </div>
 </template>
 

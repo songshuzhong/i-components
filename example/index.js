@@ -3,7 +3,7 @@ import Application from './App.vue';
 import ElementPlus from 'element-plus';
 import IRenderer from 'i-renderer/dist/js/renderer';
 
-import {Particle} from '../src/components/Particle/index.js';
+import {Verify} from '../src/components/Verify/index.js';
 
 import 'element-plus/dist/index.css';
 import 'i-renderer/dist/css/index.css';
@@ -12,10 +12,10 @@ const app = createApp(Application);
 
 const options = {
   renderers: [
-    Particle
+    Verify
   ]
 };
-app.component('Particle', Particle)
+app.component('Verify', Verify)
 app
   .use(ElementPlus)
   .use(IRenderer, options)
