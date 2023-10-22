@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import {defineComponent, onMounted, toRefs, reactive, ref, nextTick} from "vue";
+import {defineComponent, onMounted, toRefs, reactive, ref, nextTick, watch} from "vue";
 export default defineComponent({
   name: 'Verify',
   props: {
@@ -23,7 +23,7 @@ export default defineComponent({
       required: false
     },
   },
-  setup(props, con) {
+  setup(props, ctx) {
     const verify = ref(null);
     const state = reactive({
       pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",   // 随机字符串
@@ -91,7 +91,9 @@ export default defineComponent({
       }
       return imgCode;
     };
-
+    watch(() => state.imgCode, val => {
+      ctx.emit('update:value', val);
+    })
     onMounted(() => {
       nextTick(() => {
         draw();
