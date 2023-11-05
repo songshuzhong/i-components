@@ -167,7 +167,7 @@ export default {
 };
 </script>
 
-<style lang="css">
+<style>
 .luck-draw {
   height: 820px;
   width: 600px;
