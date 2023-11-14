@@ -94,7 +94,8 @@ export default defineComponent({
 
     return {
       onLinkageFormatting,
-      iAttrs
+      iAttrs,
+      state
     };
   }
 });
