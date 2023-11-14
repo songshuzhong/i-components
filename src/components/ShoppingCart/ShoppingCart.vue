@@ -77,10 +77,9 @@ export default defineComponent({
       return other;
     };
     const onLinkageFormatting = (data) => {
-      console.log(data);
       const hasOne = state.data[props.name].filter(i => i[props.primaryKey] = data[props.primaryKey]);
-      if (hasOne) {
-        hasOne.count = (hasOne.count || 0) + 1;
+      if (hasOne.length) {
+        hasOne[0].count = (hasOne[0].count || 0) + 1;
       } else {
         state.data[props.name].push(data);
       }
@@ -92,7 +91,6 @@ export default defineComponent({
       immediate: true,
     });
     onMounted(() => {
-      console.log('mounted');
       state.data[props.name] = [];
       proxy.$eventHub.$on('component:linkage', onLinkageFormatting, proxy.$attrs.path);
     });
