@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import {defineComponent, getCurrentInstance, onMounted, ref, reactive, watch} from 'vue';
+import {defineComponent, getCurrentInstance, onMounted, onBeforeUnmount, ref, reactive, watch} from 'vue';
 
 export default defineComponent({
   name: 'ShoppingCart',
@@ -91,7 +91,12 @@ export default defineComponent({
       deep: true,
       immediate: true,
     });
-
+    onMounted(() => {
+      proxy.$eventHub.$on('component:linkage', onLinkageFormatting, proxy.$attrs.path);
+    });
+    onBeforeUnmount(() => {
+      proxy.$eventHub.$off('component:linkage', onLinkageFormatting, proxy.$attrs.path);
+    });
     return {
       onLinkageFormatting,
       iAttrs,
