@@ -1,4 +1,4 @@
-<template>>
+<template>
   <template v-if="$isArray(body)">
     <i-component
       v-for="(child, index) in body"
