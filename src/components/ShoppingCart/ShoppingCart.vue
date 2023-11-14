@@ -69,7 +69,6 @@ export default defineComponent({
   setup(props, ctx) {
     const {proxy} = getCurrentInstance();
     const state = reactive({data: {}});
-    state.data[props.name] = [];
     const iAttrs = (props) => {
       const {
         // eslint-disable-next-line no-unused-vars
@@ -92,6 +91,7 @@ export default defineComponent({
       immediate: true,
     });
     onMounted(() => {
+      state.data[props.name] = [];
       proxy.$eventHub.$on('component:linkage', onLinkageFormatting, proxy.$attrs.path);
     });
     onBeforeUnmount(() => {
