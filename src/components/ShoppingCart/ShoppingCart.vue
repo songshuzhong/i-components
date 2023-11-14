@@ -77,6 +77,7 @@ export default defineComponent({
       return other;
     };
     const onLinkageFormatting = (data) => {
+      console.log(data);
       const hasOne = state.data[props.name].filter(i => i[props.primaryKey] = data[props.primaryKey]);
       if (hasOne) {
         hasOne.count = (hasOne.count || 0) + 1;
@@ -84,8 +85,8 @@ export default defineComponent({
         state.data[props.name].push(data);
       }
     };
-    watch(() => props.initData, (val) => {
-      state.data = val;
+    watch(() => props.initData, (val = {}) => {
+      Object.assign(state.data, val);
     }, {
       deep: true,
       immediate: true,
