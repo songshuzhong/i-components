@@ -92,6 +92,7 @@ export default defineComponent({
       immediate: true,
     });
     onMounted(() => {
+      console.log('mounted');
       state.data[props.name] = [];
       proxy.$eventHub.$on('component:linkage', onLinkageFormatting, proxy.$attrs.path);
     });
