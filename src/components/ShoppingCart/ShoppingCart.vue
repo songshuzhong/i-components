@@ -77,12 +77,18 @@ export default defineComponent({
       return other;
     };
     const onLinkageFormatting = (target, data) => {
-      if (target === props.name) {
-        const hasOne = state.data[props.name].filter(i => i[props.primaryKey] === data[props.primaryKey]);
-        if (hasOne.length) {
-          hasOne[0].count = (hasOne[0].count || 0) + 1;
+      if (target.includes(props.name)) {
+        const [name, type] = target.split('?');
+        if (type === 'merge') {
+          Object.assign(state.data, data);
         } else {
-          state.data[props.name].push(data);
+          const hasOne = state.data[props.name].filter(i => i[props.primaryKey] === data[props.primaryKey]);
+          if (hasOne.length) {
+            hasOne[0].count = (hasOne[0].count || 1) + 1;
+          } else {
+            data.count = 1;
+            state.data[props.name].push(data);
+          }
         }
       }
     };
