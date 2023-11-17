@@ -205,4 +205,7 @@ export default defineComponent({
   background-color: var(--el-color-danger);
   transition: all 1s linear;
 }
+.drop-enter-from {
+  left: 0 !important;
+}
 </style>
