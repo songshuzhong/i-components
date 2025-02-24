@@ -1,7 +1,7 @@
 <template>
   <div
-    :class="['i-table-td-selector']"
-    :style="{
+      :class="['i-table-td-selector']"
+      :style="{
       top: shape.top,
       left: shape.left,
       width: shape.width,
@@ -47,6 +47,38 @@ export default defineComponent({
     let tableBody;
     let rowKey;
     let selectedCells = false;
+    const completeTable = (cells, rowLength, colLength) => {
+      const result = new Array(rowLength);
+      for (let i = 0; i < rowLength; i++) {
+        result[i] = new Array(colLength).fill(0);
+      }
+      let countCol = 0;
+      let countRow = 0;
+      for (let i = 0; i < cells.length; i++) {
+        let cell = cells[i];
+        const rowSpan = parseInt(cell.getAttribute('rowspan') || 1, 10);
+        const colSpan = parseInt(cell.getAttribute('colspan') || 1, 10);
+        result[countRow][countCol] = cell;
+        countCol++;
+        if (colSpan > 1) {
+          for (let col = 0; col < colSpan; col++) {
+            result[countRow][countCol] = null;
+            countCol++;
+          }
+        }
+        let currentColumnIndex = countCol % colLength;
+        if ((countCol - 1) % colLength === 0 && countCol > 1) {
+          countRow++;
+          countCol = 0;
+        }
+        if (rowSpan > 1) {
+          for (let i = 0; i < rowSpan; i++) {
+            result[countRow][currentColumnIndex] = null;
+          }
+        }
+      }
+      return result;
+    };
     const clearActiveCells = () => {
       const cells = table.$el.querySelectorAll('.el-table__cell');
       cells.forEach((cell) => {
@@ -90,77 +122,96 @@ export default defineComponent({
       if (currentY < point.startY) shape.top = `${currentY}px`;
     };
     const onMouseUp = (event) => {
-      isDragging.value = false;
-      shape.left = `-100px`;
-      shape.top = `-100px`;
-      shape.width = '0px';
-      shape.height = '0px';
+      try {
+        isDragging.value = false;
+        shape.left = `-100px`;
+        shape.top = `-100px`;
+        shape.width = '0px';
+        shape.height = '0px';
 
-      const x = event.clientX;
-      const y = event.clientY;
-      const minX = Math.min(x, point.startX);
-      const maxX = Math.max(x, point.startX);
-      const minY = Math.min(y, point.startY);
-      const maxY = Math.max(y, point.startY);
-      const rect = {
-        x1: minX,
-        x2: maxX,
-        y1: minY,
-        y2: maxY,
-      };
-      const rows = table.rows;
-      const flatColumn = table.flatColumn;
-      const cells = table.$el.querySelectorAll('.el-table__cell');
-      let activeCells = [];
-      cells.forEach((cell, index) => {
-        if (isCovered(rect, cell)) {
-          const rowIndex = Math.floor(index / flatColumn.length) - 1;
-          const columnIndex = index % flatColumn.length;
-          const columnProp = flatColumn[columnIndex].name;
-          const tdValue = rows[rowIndex][columnProp];
-          if (!iModelValue.value[props.name][rowIndex]) {
-            iModelValue.value[props.name][rowIndex] = [];
+        const x = event.clientX;
+        const y = event.clientY;
+        const minX = Math.min(x, point.startX);
+        const maxX = Math.max(x, point.startX);
+        const minY = Math.min(y, point.startY);
+        const maxY = Math.max(y, point.startY);
+        const rect = {
+          x1: minX,
+          x2: maxX,
+          y1: minY,
+          y2: maxY,
+        };
+        const rows = table.rows;
+        const flatColumn = table.flatColumn;
+        const cells = tableBody.querySelectorAll('.el-table__cell');
+        let activeCells = [];
+        const cells2 = completeTable(cells, rows.length, flatColumn.length);
+        for (let i = 0; i < cells2.length; i++) {
+          let rowIndex = i;
+          for (let j = 0; j < cells2[i].length; j++) {
+            let columnIndex = j;
+            let cell = cells2[i][j];
+            if (cell && isCovered(rect, cell)) {
+              const columnProp = flatColumn[columnIndex].name;
+              const tdValue = rows[rowIndex][columnProp] || '';
+              if (!iModelValue.value[props.name][rowIndex]) {
+                iModelValue.value[props.name][rowIndex] = [];
+              }
+              iModelValue.value[props.name][rowIndex].push({
+                [columnProp]: tdValue,
+                [rowKey]: rows[rowIndex][rowKey]
+              });
+              selectedCells = true;
+              activeCells.push(cell);
+              cell.classList.add('active-cell');
+            }
           }
-          iModelValue.value[props.name][rowIndex].push({
-            [columnProp]: tdValue,
-            [rowKey]: rows[rowIndex][rowKey]
-          });
-          selectedCells = true;
-          activeCells.push(cell);
-          cell.classList.add('active-cell');
         }
-      });
-      const totalRows = Object.keys(iModelValue.value[props.name]).length;
-      const totalColumns = activeCells.length / totalRows;
-      activeCells.forEach((cell, index) => {
-        if (index < totalColumns) {
-          cell.classList.add('half-border-top');
-        }
-        if (index >= (totalRows - 1) * totalColumns) {
-          cell.classList.add('half-border-bottom');
-        }
-        if (Number.isInteger(index / totalColumns)) {
-          cell.classList.add('half-border-left');
-        }
-        if (Number.isInteger((index + 1) / totalColumns)) {
-          cell.classList.add('half-border-right');
-        }
-      });
-      activeCells = null;
-      if (props.target && selectedCells) {
-        proxy.$eventHub.$emit(
-          'component:linkage',
-          props.target,
-          {[props.name]: Object.values(iModelValue.value[props.name]).map(i => i)},
-          () => {
-            selectedCells = false;
-            iModelValue.value[props.name] = {};
-            clearActiveCells();
-          },
-          {
-            linkedOn: props.linkedOn
+        const totalRows = Object.keys(iModelValue.value[props.name]).length;
+        const totalColumns = activeCells.length / totalRows;
+        activeCells.forEach((cell, index) => {
+          if (index < totalColumns) {
+            cell.classList.add('half-border-top');
           }
-        );
+          if (index >= (totalRows - 1) * totalColumns) {
+            cell.classList.add('half-border-bottom');
+          }
+          if (Number.isInteger(index / totalColumns)) {
+            cell.classList.add('half-border-left');
+          }
+          if (Number.isInteger((index + 1) / totalColumns)) {
+            cell.classList.add('half-border-right');
+          }
+        });
+        const context = {
+          type: 'merge'
+        };
+        context[props.name] = Object.values(iModelValue.value[props.name]).map(i => i);
+        if (activeCells.length === 1) {
+          const rowSpan = parseInt(activeCells[0].getAttribute('rowspan') || 1, 10);
+          const colSpan = parseInt(activeCells[0].getAttribute('colspan') || 1, 10);
+          if (rowSpan > 1 || colSpan > 1) {
+            context.type = 'split';
+          }
+        }
+        activeCells = null;
+        if (props.target && selectedCells) {
+          proxy.$eventHub.$emit(
+              'component:linkage',
+              props.target,
+              context,
+              () => {
+                selectedCells = false;
+                iModelValue.value[props.name] = {};
+                clearActiveCells();
+              },
+              {
+                linkedOn: props.linkedOn
+              }
+          );
+        }
+      } catch (e) {
+        console.error(e);
       }
     };
     onMounted(() => {
