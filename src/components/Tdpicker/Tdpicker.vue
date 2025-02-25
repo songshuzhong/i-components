@@ -61,13 +61,13 @@ export default defineComponent({
         result[countRow][countCol] = cell;
         countCol++;
         if (colSpan > 1) {
-          for (let col = 0; col < colSpan; col++) {
+          for (let col = 1; col < colSpan; col++) {
             result[countRow][countCol] = null;
             countCol++;
           }
         }
         let currentColumnIndex = countCol % colLength;
-        if ((countCol - 1) % colLength === 0 && countCol > 1) {
+        if (countCol % colLength === 0 && countCol > 1) {
           countRow++;
           countCol = 0;
         }
@@ -144,7 +144,9 @@ export default defineComponent({
         const rows = table.rows;
         const flatColumn = table.flatColumn;
         const cells = tableBody.querySelectorAll('.el-table__cell');
+        const activeCellMap = new WeakMap();
         let activeCells = [];
+        let hasSpecialColumn = false;
         const cells2 = completeTable(cells, rows.length, flatColumn.length);
         for (let i = 0; i < cells2.length; i++) {
           let rowIndex = i;
@@ -154,6 +156,9 @@ export default defineComponent({
             if (cell && isCovered(rect, cell)) {
               const columnProp = flatColumn[columnIndex].name;
               const tdValue = rows[rowIndex][columnProp] || '';
+              if ('left,right'.includes(flatColumn[columnIndex].fixed)) {
+                hasSpecialColumn = true;
+              }
               if (!iModelValue.value[props.name][rowIndex]) {
                 iModelValue.value[props.name][rowIndex] = [];
               }
@@ -164,8 +169,18 @@ export default defineComponent({
               selectedCells = true;
               activeCells.push(cell);
               cell.classList.add('active-cell');
+              activeCellMap.set(cell, {rowIndex, columnIndex, columnProp});
             }
           }
+        }
+        if (hasSpecialColumn) {
+          proxy.$message({
+            message: '浮动列禁止合并',
+            grouping: true,
+            showClose: true,
+            type: 'error',
+          });
+          return clearActiveCells();
         }
         const totalRows = Object.keys(iModelValue.value[props.name]).length;
         const totalColumns = activeCells.length / totalRows;
@@ -191,23 +206,35 @@ export default defineComponent({
           const rowSpan = parseInt(activeCells[0].getAttribute('rowspan') || 1, 10);
           const colSpan = parseInt(activeCells[0].getAttribute('colspan') || 1, 10);
           if (rowSpan > 1 || colSpan > 1) {
+            const cellDetails = activeCellMap.get(activeCells[0]);
+            const tds = [];
             context.type = 'split';
+            if (colSpan > 1) {
+              for (let j = 0; j < colSpan; j++) {
+                tds.push({
+                  ...flatColumn[cellDetails.columnIndex + j],
+                  [cellDetails.columnProp]: rows[cellDetails.rowIndex][cellDetails.columnIndex + j],
+                  [rowKey]: rows[cellDetails.rowIndex][rowKey]
+                });
+              }
+            }
+            context.tds = tds;
           }
         }
         activeCells = null;
         if (props.target && selectedCells) {
           proxy.$eventHub.$emit(
-              'component:linkage',
-              props.target,
-              context,
-              () => {
-                selectedCells = false;
-                iModelValue.value[props.name] = {};
-                clearActiveCells();
-              },
-              {
-                linkedOn: props.linkedOn
-              }
+            'component:linkage',
+            props.target,
+            context,
+            () => {
+              selectedCells = false;
+              iModelValue.value[props.name] = {};
+              clearActiveCells();
+            },
+            {
+              linkedOn: props.linkedOn
+            }
           );
         }
       } catch (e) {
