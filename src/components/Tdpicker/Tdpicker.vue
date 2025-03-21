@@ -41,6 +41,10 @@ export default defineComponent({
       top: 0,
       left: 0,
     });
+    const status = {
+      '1': '浮动列禁止合并',
+      '2': '合并前请拆分单元格'
+    };
     const point = {};
     let isDragging = ref(false);
     let table;
@@ -55,12 +59,26 @@ export default defineComponent({
       let countCol = 0;
       let countRow = 0;
       for (let i = 0; i < cells.length; i++) {
+        let bothMerged = false;
         let cell = cells[i];
         const rowSpan = parseInt(cell.getAttribute('rowspan') || 1, 10);
         const colSpan = parseInt(cell.getAttribute('colspan') || 1, 10);
+        while (result[countRow] && result[countRow][countCol] == null) {
+          countCol++;
+        }
         result[countRow][countCol] = cell;
         countCol++;
-        if (colSpan > 1) {
+        if (colSpan > 1 && rowSpan > 1) {
+          bothMerged = true;
+          countCol--;
+          for (let j = 0; j < colSpan; j++) {
+            for (let i = 0; i < rowSpan; i++) {
+              result[countRow + i][countCol] = null;
+            }
+            countCol++;
+          }
+        }
+        if (colSpan > 1 && !bothMerged) {
           for (let col = 1; col < colSpan; col++) {
             result[countRow][countCol] = null;
             countCol++;
@@ -71,9 +89,9 @@ export default defineComponent({
           countRow++;
           countCol = 0;
         }
-        if (rowSpan > 1) {
-          for (let i = 0; i < rowSpan; i++) {
-            result[countRow][currentColumnIndex] = null;
+        if (rowSpan > 1 && !bothMerged) {
+          for (let i = 1; i < rowSpan; i++) {
+            result[countRow + i][currentColumnIndex] = null;
           }
         }
       }
@@ -93,11 +111,30 @@ export default defineComponent({
       const elemRect = element.getBoundingClientRect();
       const elemCenterX = elemRect.left + elemRect.width / 2;
       const elemCenterY = elemRect.top + elemRect.height / 2;
-      return (
-          rect.x1 <= elemCenterX && elemCenterX <= rect.x2 &&
-          rect.y1 <= elemCenterY && elemCenterY <= rect.y2
-      );
+      return rect.x1 <= elemCenterX && elemCenterX <= rect.x2 && rect.y1 <= elemCenterY && elemCenterY <= rect.y2;
     }
+    const getRectangleFromEvents = (rect) => {
+      const left = Math.min(rect.x1, rect.x2);
+      const top = Math.min(rect.y1, rect.y2);
+      const right = Math.max(rect.x1, rect.x2);
+      const bottom = Math.max(rect.y1, rect.y2);
+      return {left, top, right, bottom};
+    };
+    const isUnder = (rect, ele) => {
+      const el = ele.getBoundingClientRect();
+      // 元素在矩形右下方
+      const isOverlap1 = el.top > rect.top && el.top < rect.bottom && el.left > rect.left && el.left < rect.right;
+      // 元素在矩形左下方
+      const isOverlap2 = el.top > rect.top && el.top < rect.bottom && el.right > rect.left && el.right < rect.right;
+      // 元素在矩形左上方
+      const isOverlap3 = el.bottom > rect.top && el.bottom < rect.bottom && el.right > rect.left && el.right < rect.right;
+      // 元素在矩形右上方
+      const isOverlap4 = el.bottom > rect.top && el.bottom < rect.bottom && el.left > rect.left && el.left < rect.right;
+      // 元素横穿矩形
+      const isOverlap5 = el.top >= rect.top && el.bottom <= rect.bottom && el.left <= rect.left && el.right >= rect.right;
+
+      return isOverlap1 || isOverlap2 || isOverlap3 || isOverlap4 || isOverlap5;
+    };
     const onMouseDown = (event) => {
       isDragging.value = true;
       point.startX = event.clientX;
@@ -122,108 +159,117 @@ export default defineComponent({
       if (currentY < point.startY) shape.top = `${currentY}px`;
     };
     const onMouseUp = (event) => {
-      try {
-        isDragging.value = false;
-        shape.left = `-100px`;
-        shape.top = `-100px`;
-        shape.width = '0px';
-        shape.height = '0px';
+      isDragging.value = false;
+      shape.left = `-100px`;
+      shape.top = `-100px`;
+      shape.width = '0px';
+      shape.height = '0px';
 
-        const x = event.clientX;
-        const y = event.clientY;
-        const minX = Math.min(x, point.startX);
-        const maxX = Math.max(x, point.startX);
-        const minY = Math.min(y, point.startY);
-        const maxY = Math.max(y, point.startY);
-        const rect = {
-          x1: minX,
-          x2: maxX,
-          y1: minY,
-          y2: maxY,
-        };
-        const rows = table.rows;
-        const flatColumn = table.flatColumn;
-        const cells = tableBody.querySelectorAll('.el-table__cell');
-        const activeCellMap = new WeakMap();
-        let activeCells = [];
-        let hasSpecialColumn = false;
-        const cells2 = completeTable(cells, rows.length, flatColumn.length);
-        for (let i = 0; i < cells2.length; i++) {
-          let rowIndex = i;
-          for (let j = 0; j < cells2[i].length; j++) {
-            let columnIndex = j;
-            let cell = cells2[i][j];
-            if (cell && isCovered(rect, cell)) {
-              const columnProp = flatColumn[columnIndex].name;
-              const tdValue = rows[rowIndex][columnProp] || '';
-              if ('left,right'.includes(flatColumn[columnIndex].fixed)) {
-                hasSpecialColumn = true;
-              }
-              if (!iModelValue.value[props.name][rowIndex]) {
-                iModelValue.value[props.name][rowIndex] = [];
-              }
-              iModelValue.value[props.name][rowIndex].push({
-                [columnProp]: tdValue,
-                [rowKey]: rows[rowIndex][rowKey]
-              });
-              selectedCells = true;
-              activeCells.push(cell);
-              cell.classList.add('active-cell');
-              activeCellMap.set(cell, {rowIndex, columnIndex, columnProp});
+      const x = event.clientX;
+      const y = event.clientY;
+      const minX = Math.min(x, point.startX);
+      const maxX = Math.max(x, point.startX);
+      const minY = Math.min(y, point.startY);
+      const maxY = Math.max(y, point.startY);
+      const rect = {
+        x1: minX,
+        x2: maxX,
+        y1: minY,
+        y2: maxY,
+      };
+      const rows = table.rows;
+      const flatColumn = table.flatColumn;
+      const activeCellMap = new WeakMap();
+      let cells = tableBody.querySelectorAll('.el-table__cell');
+      let activeCells = [];
+      let hasSpecialColumn = '';
+      cells = completeTable(cells, rows.length, flatColumn.length);
+      const rect1 = getRectangleFromEvents(rect);
+      for (let i = 0; i < cells.length; i++) {
+        let rowIndex = i;
+        for (let j = 0; j < cells[i].length; j++) {
+          let columnIndex = j;
+          let cell = cells[i][j];
+          if (!cell) {
+            let j1 = j - 1;
+            let cell1 = cells[i][j1];
+            if (cell1 && isUnder(rect1, cell1)) {
+              hasSpecialColumn = '2';
             }
           }
+          if (cell && isCovered(rect, cell)) {
+            const columnProp = flatColumn[columnIndex].name;
+            const tdValue = rows[rowIndex][columnProp] || '';
+            if ('left,right'.includes(flatColumn[columnIndex].fixed)) {
+              hasSpecialColumn = '1';
+            }
+            if (!iModelValue.value[props.name][rowIndex]) {
+              iModelValue.value[props.name][rowIndex] = [];
+            }
+            iModelValue.value[props.name][rowIndex].push({
+              [columnProp]: tdValue,
+              [rowKey]: rows[rowIndex][rowKey]
+            });
+            selectedCells = true;
+            activeCells.push(cell);
+            cell.classList.add('active-cell');
+            activeCellMap.set(cell, {rowIndex, columnIndex, columnProp});
+          }
         }
-        if (hasSpecialColumn) {
-          proxy.$message({
-            message: '浮动列禁止合并',
-            grouping: true,
-            showClose: true,
-            type: 'error',
-          });
-          return clearActiveCells();
-        }
-        const totalRows = Object.keys(iModelValue.value[props.name]).length;
-        const totalColumns = activeCells.length / totalRows;
-        activeCells.forEach((cell, index) => {
-          if (index < totalColumns) {
-            cell.classList.add('half-border-top');
-          }
-          if (index >= (totalRows - 1) * totalColumns) {
-            cell.classList.add('half-border-bottom');
-          }
-          if (Number.isInteger(index / totalColumns)) {
-            cell.classList.add('half-border-left');
-          }
-          if (Number.isInteger((index + 1) / totalColumns)) {
-            cell.classList.add('half-border-right');
-          }
+      }
+      if (hasSpecialColumn) {
+        proxy.$message({
+          message: status[hasSpecialColumn],
+          grouping: true,
+          showClose: true,
+          type: 'error',
         });
-        const context = {
-          type: 'merge'
-        };
-        context[props.name] = Object.values(iModelValue.value[props.name]).map(i => i);
-        if (activeCells.length === 1) {
-          const rowSpan = parseInt(activeCells[0].getAttribute('rowspan') || 1, 10);
-          const colSpan = parseInt(activeCells[0].getAttribute('colspan') || 1, 10);
-          if (rowSpan > 1 || colSpan > 1) {
-            const cellDetails = activeCellMap.get(activeCells[0]);
-            const tds = [];
-            context.type = 'split';
-            if (colSpan > 1) {
-              for (let j = 0; j < colSpan; j++) {
-                tds.push({
-                  ...flatColumn[cellDetails.columnIndex + j],
-                  [cellDetails.columnProp]: rows[cellDetails.rowIndex][cellDetails.columnIndex + j],
-                  [rowKey]: rows[cellDetails.rowIndex][rowKey]
-                });
-              }
-            }
-            context.tds = tds;
-          }
+        iModelValue.value[props.name] = {};
+        return clearActiveCells();
+      }
+      const totalRows = Object.keys(iModelValue.value[props.name]).length;
+      const totalColumns = activeCells.length / totalRows;
+      activeCells.forEach((cell, index) => {
+        if (index < totalColumns) {
+          cell.classList.add('half-border-top');
         }
-        activeCells = null;
-        if (props.target && selectedCells) {
-          proxy.$eventHub.$emit(
+        if (index >= (totalRows - 1) * totalColumns) {
+          cell.classList.add('half-border-bottom');
+        }
+        if (Number.isInteger(index / totalColumns)) {
+          cell.classList.add('half-border-left');
+        }
+        if (Number.isInteger((index + 1) / totalColumns)) {
+          cell.classList.add('half-border-right');
+        }
+      });
+      const context = {
+        type: 'merge'
+      };
+      context[props.name] = Object.values(iModelValue.value[props.name]).map(i => i);
+      if (activeCells.length === 1) {
+        const rowSpan = parseInt(activeCells[0].getAttribute('rowspan') || 1, 10);
+        const colSpan = parseInt(activeCells[0].getAttribute('colspan') || 1, 10);
+        if (rowSpan > 1 || colSpan > 1) {
+          const cellDetails = activeCellMap.get(activeCells[0]);
+          const tds = [];
+          context.type = 'split';
+          if (colSpan > 1) {
+            for (let j = 0; j < colSpan; j++) {
+              tds.push({
+                ...flatColumn[cellDetails.columnIndex + j],
+                [cellDetails.columnProp]: rows[cellDetails.rowIndex][cellDetails.columnIndex + j],
+                [rowKey]: rows[cellDetails.rowIndex][rowKey]
+              });
+            }
+          }
+          context.tds = tds;
+        }
+      }
+      activeCells = null;
+      cells = null;
+      if (props.target && selectedCells) {
+        proxy.$eventHub.$emit(
             'component:linkage',
             props.target,
             context,
@@ -235,10 +281,7 @@ export default defineComponent({
             {
               linkedOn: props.linkedOn
             }
-          );
-        }
-      } catch (e) {
-        console.error(e);
+        );
       }
     };
     onMounted(() => {
@@ -259,6 +302,7 @@ export default defineComponent({
       table.$el.removeEventListener('mousemove', onMouseMove);
       tableBody.removeEventListener('mousedown', onMouseDown);
       table = null;
+      tableBody = null;
     });
     return {
       isDragging,
